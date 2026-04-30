@@ -124,7 +124,9 @@ const translations: Record<Lang, Dict> = {
     "form.messagePlaceholder": "Talebinizi veya ürün listenizi yazın",
     "form.submit": "Formu Gönder",
     "form.submitting": "Gönderiliyor...",
+    "form.successTitle": "Mesajınız başarıyla gönderildi",
     "form.success": "Mesajınız gönderildi. En kısa sürede sizinle iletişime geçeceğiz.",
+    "form.successAnimation": "Mesaj gönderildi animasyonu",
     "form.error": "Mesaj gönderilemedi. Lütfen daha sonra tekrar deneyin veya WhatsApp ile ulaşın.",
 
     "footer.tagline": "İstanbul merkezli B2B gıda ve gemi tedariki — gemiler, ağırlama ve toptan alıcılar için.",
@@ -250,7 +252,9 @@ const translations: Record<Lang, Dict> = {
     "form.messagePlaceholder": "Tell us about your request or product list",
     "form.submit": "Submit Form",
     "form.submitting": "Submitting...",
+    "form.successTitle": "Message sent successfully",
     "form.success": "Your message has been sent. We will contact you shortly.",
+    "form.successAnimation": "Message sent animation",
     "form.error": "Your message could not be sent. Please try again later or contact us on WhatsApp.",
 
     "footer.tagline": "Istanbul-based B2B food and ship supply for marine, hospitality and wholesale buyers.",
@@ -376,7 +380,9 @@ const translations: Record<Lang, Dict> = {
     "form.messagePlaceholder": "Beschreiben Sie Ihre Anfrage oder Produktliste",
     "form.submit": "Formular senden",
     "form.submitting": "Wird gesendet...",
+    "form.successTitle": "Nachricht erfolgreich gesendet",
     "form.success": "Ihre Nachricht wurde gesendet. Wir melden uns in Kürze bei Ihnen.",
+    "form.successAnimation": "Animation fuer gesendete Nachricht",
     "form.error": "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut oder kontaktieren Sie uns über WhatsApp.",
 
     "footer.tagline": "B2B-Lebensmittel- und Schiffsausrüstung aus Istanbul für Schifffahrt, Gastronomie und Großhandel.",
@@ -502,7 +508,9 @@ const translations: Record<Lang, Dict> = {
     "form.messagePlaceholder": "Cuéntanos tu solicitud o lista de productos",
     "form.submit": "Enviar formulario",
     "form.submitting": "Enviando...",
+    "form.successTitle": "Mensaje enviado correctamente",
     "form.success": "Tu mensaje ha sido enviado. Nos pondremos en contacto contigo pronto.",
+    "form.successAnimation": "Animacion de mensaje enviado",
     "form.error": "No se pudo enviar tu mensaje. Inténtalo de nuevo más tarde o contáctanos por WhatsApp.",
 
     "footer.tagline": "Suministro B2B de alimentos y naval con base en Estambul para marina, hostelería y mayoristas.",

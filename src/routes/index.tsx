@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { DetailedHTMLProps, HTMLAttributes } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Anchor,
@@ -32,6 +33,19 @@ import catBevImg from "@/assets/cat-bev.jpg";
 import catDairyImg from "@/assets/cat-dairy.jpg";
 import catCustomImg from "@/assets/cat-custom.jpg";
 import footerLogo from "@/assets/logo-src-top.png";
+
+declare module "react" {
+  namespace JSX {
+    interface IntrinsicElements {
+      "lottie-player": DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement> & {
+        src?: string;
+        background?: string;
+        speed?: string;
+        autoplay?: boolean;
+      };
+    }
+  }
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -413,108 +427,116 @@ function FinalCTA() {
           )}
         >
           <div className="overflow-hidden">
-            <form
-              onSubmit={async (event) => {
-                event.preventDefault();
-                const form = event.currentTarget;
-                setSubmitState("submitting");
-                setSubmitMessage("");
-
-                try {
-                  const formData = new FormData(form);
-                  const response = await fetch("https://api.web3forms.com/submit", {
-                    method: "POST",
-                    body: formData,
-                  });
-                  const result = await response.json();
-
-                  if (response.ok && result.success) {
-                    form.reset();
-                    setSubmitState("success");
-                    setSubmitMessage(t("form.success"));
-                    return;
-                  }
-
-                  setSubmitState("error");
-                  setSubmitMessage(result.message || t("form.error"));
-                } catch {
-                  setSubmitState("error");
-                  setSubmitMessage(t("form.error"));
-                }
-              }}
-              className="rounded-2xl border border-white/20 bg-white/10 p-6 text-left shadow-[var(--shadow-soft)] backdrop-blur-md md:p-8"
-            >
-              <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
-              <input type="hidden" name="subject" value="SRC Gida Website Contact Form" />
-              <input type="hidden" name="from_name" value="SRC Gida Website" />
-              <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <label className="block">
-                  <span className="text-sm font-medium text-white/90">{t("form.name")}</span>
-                  <input
-                    type="text"
-                    name="name"
-                    required
-                    autoComplete="name"
-                    className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
-                    placeholder={t("form.namePlaceholder")}
-                  />
-                </label>
-                <label className="block">
-                  <span className="text-sm font-medium text-white/90">{t("form.phone")}</span>
-                  <input
-                    type="tel"
-                    name="phone"
-                    required
-                    autoComplete="tel"
-                    className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
-                    placeholder={t("form.phonePlaceholder")}
-                  />
-                </label>
+            {submitState === "success" ? (
+              <div className="rounded-2xl border border-emerald-200/30 bg-white/10 p-8 text-center shadow-[var(--shadow-soft)] backdrop-blur-md animate-fade-in-up">
+                <lottie-player
+                  src="/lottie/message-sent-plane.json"
+                  background="transparent"
+                  speed="1"
+                  autoplay
+                  className="mx-auto h-52 w-52"
+                  aria-label={t("form.successAnimation")}
+                />
+                <h3 className="mt-4 text-2xl font-bold text-white">{t("form.successTitle")}</h3>
+                <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/80">{submitMessage}</p>
               </div>
-              <label className="mt-5 block">
-                <span className="text-sm font-medium text-white/90">{t("form.email")}</span>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  autoComplete="email"
-                  className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
-                  placeholder={t("form.emailPlaceholder")}
-                />
-              </label>
-              <label className="mt-5 block">
-                <span className="text-sm font-medium text-white/90">{t("form.message")}</span>
-                <textarea
-                  name="message"
-                  required
-                  rows={5}
-                  className="mt-2 w-full resize-none rounded-md border border-white/20 bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
-                  placeholder={t("form.messagePlaceholder")}
-                />
-              </label>
-              {submitMessage && (
-                <p
-                  className={cn(
-                    "mt-5 rounded-md border px-4 py-3 text-sm font-medium",
-                    submitState === "success"
-                      ? "border-emerald-200/50 bg-emerald-500/20 text-emerald-50"
-                      : "border-red-200/50 bg-red-500/20 text-red-50",
-                  )}
-                >
-                  {submitMessage}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={submitState === "submitting"}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.01] sm:w-auto"
-                style={{ background: "var(--gradient-brand)" }}
+            ) : (
+              <form
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  const form = event.currentTarget;
+                  setSubmitState("submitting");
+                  setSubmitMessage("");
+
+                  try {
+                    const formData = new FormData(form);
+                    const response = await fetch("https://api.web3forms.com/submit", {
+                      method: "POST",
+                      body: formData,
+                    });
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                      form.reset();
+                      setSubmitState("success");
+                      setSubmitMessage(t("form.success"));
+                      return;
+                    }
+
+                    setSubmitState("error");
+                    setSubmitMessage(result.message || t("form.error"));
+                  } catch {
+                    setSubmitState("error");
+                    setSubmitMessage(t("form.error"));
+                  }
+                }}
+                className="rounded-2xl border border-white/20 bg-white/10 p-6 text-left shadow-[var(--shadow-soft)] backdrop-blur-md md:p-8"
               >
-                {submitState === "submitting" ? t("form.submitting") : t("form.submit")} <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
+                <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+                <input type="hidden" name="subject" value="SRC Gida Website Contact Form" />
+                <input type="hidden" name="from_name" value="SRC Gida Website" />
+                <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+
+                <div className="grid gap-5 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="text-sm font-medium text-white/90">{t("form.name")}</span>
+                    <input
+                      type="text"
+                      name="name"
+                      required
+                      autoComplete="name"
+                      className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                      placeholder={t("form.namePlaceholder")}
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-white/90">{t("form.phone")}</span>
+                    <input
+                      type="tel"
+                      name="phone"
+                      required
+                      autoComplete="tel"
+                      className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                      placeholder={t("form.phonePlaceholder")}
+                    />
+                  </label>
+                </div>
+                <label className="mt-5 block">
+                  <span className="text-sm font-medium text-white/90">{t("form.email")}</span>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    autoComplete="email"
+                    className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                    placeholder={t("form.emailPlaceholder")}
+                  />
+                </label>
+                <label className="mt-5 block">
+                  <span className="text-sm font-medium text-white/90">{t("form.message")}</span>
+                  <textarea
+                    name="message"
+                    required
+                    rows={5}
+                    className="mt-2 w-full resize-none rounded-md border border-white/20 bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                    placeholder={t("form.messagePlaceholder")}
+                  />
+                </label>
+                {submitMessage && (
+                  <p className="mt-5 rounded-md border border-red-200/50 bg-red-500/20 px-4 py-3 text-sm font-medium text-red-50">
+                    {submitMessage}
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={submitState === "submitting"}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+                  style={{ background: "var(--gradient-brand)" }}
+                >
+                  {submitState === "submitting" ? t("form.submitting") : t("form.submit")} <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </div>
