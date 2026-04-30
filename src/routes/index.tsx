@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Anchor,
@@ -52,25 +52,6 @@ export const Route = createFileRoute("/")({
 
 const WHATSAPP_URL = "https://wa.me/905468333700";
 const WEB3FORMS_ACCESS_KEY = "ed2564da-0f8d-4fcc-aa22-f16a545d56a8";
-const HCAPTCHA_SITE_KEY = "50b2fe65-b00b-4b9e-ad62-3ba471098be2";
-
-declare global {
-  interface Window {
-    hcaptcha?: {
-      render: (
-        container: HTMLElement,
-        options: {
-          sitekey: string;
-          theme?: "light" | "dark";
-          callback?: () => void;
-          "expired-callback"?: () => void;
-          "error-callback"?: () => void;
-        },
-      ) => string;
-      reset: (widgetId?: string) => void;
-    };
-  }
-}
 
 function Index() {
   return (
@@ -390,47 +371,11 @@ function FAQ() {
 
 /* ---------- FINAL CTA ---------- */
 function FinalCTA() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const { ref, isVisible } = useIntersectionObserver();
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [captchaError, setCaptchaError] = useState(false);
-  const captchaContainerRef = useRef<HTMLDivElement | null>(null);
-  const captchaWidgetIdRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    if (!isFormOpen || !captchaContainerRef.current || captchaWidgetIdRef.current) return;
-
-    const renderCaptcha = () => {
-      if (!window.hcaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current) return;
-
-      captchaWidgetIdRef.current = window.hcaptcha.render(captchaContainerRef.current, {
-        sitekey: HCAPTCHA_SITE_KEY,
-        theme: "dark",
-        callback: () => setCaptchaError(false),
-        "expired-callback": () => setCaptchaError(true),
-        "error-callback": () => setCaptchaError(true),
-      });
-    };
-
-    if (window.hcaptcha) {
-      renderCaptcha();
-      return;
-    }
-
-    const existingScript = document.querySelector<HTMLScriptElement>('script[data-hcaptcha="true"]');
-    if (existingScript) {
-      existingScript.addEventListener("load", renderCaptcha, { once: true });
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = `https://js.hcaptcha.com/1/api.js?render=explicit&hl=${lang}`;
-    script.async = true;
-    script.defer = true;
-    script.dataset.hcaptcha = "true";
-    script.addEventListener("load", renderCaptcha, { once: true });
-    document.body.appendChild(script);
-  }, [isFormOpen, lang]);
+  const [submitState, setSubmitState] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [submitMessage, setSubmitMessage] = useState("");
 
   return (
     <section ref={ref} id="contact" className="py-24 text-white relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
@@ -469,21 +414,33 @@ function FinalCTA() {
         >
           <div className="overflow-hidden">
             <form
-              action="https://api.web3forms.com/submit"
-              method="POST"
-              onSubmit={(event) => {
+              onSubmit={async (event) => {
+                event.preventDefault();
                 const form = event.currentTarget;
-                const captchaResponse = form.querySelector<HTMLTextAreaElement>(
-                  'textarea[name="h-captcha-response"]',
-                );
+                setSubmitState("submitting");
+                setSubmitMessage("");
 
-                if (!captchaResponse?.value) {
-                  event.preventDefault();
-                  setCaptchaError(true);
-                  return;
+                try {
+                  const formData = new FormData(form);
+                  const response = await fetch("https://api.web3forms.com/submit", {
+                    method: "POST",
+                    body: formData,
+                  });
+                  const result = await response.json();
+
+                  if (response.ok && result.success) {
+                    form.reset();
+                    setSubmitState("success");
+                    setSubmitMessage(t("form.success"));
+                    return;
+                  }
+
+                  setSubmitState("error");
+                  setSubmitMessage(result.message || t("form.error"));
+                } catch {
+                  setSubmitState("error");
+                  setSubmitMessage(t("form.error"));
                 }
-
-                setCaptchaError(false);
               }}
               className="rounded-2xl border border-white/20 bg-white/10 p-6 text-left shadow-[var(--shadow-soft)] backdrop-blur-md md:p-8"
             >
@@ -537,18 +494,25 @@ function FinalCTA() {
                   placeholder={t("form.messagePlaceholder")}
                 />
               </label>
-              <div className="mt-5">
-                <div ref={captchaContainerRef} className="min-h-[78px]" />
-                {captchaError && (
-                  <p className="mt-2 text-sm font-medium text-red-100">{t("form.captchaRequired")}</p>
-                )}
-              </div>
+              {submitMessage && (
+                <p
+                  className={cn(
+                    "mt-5 rounded-md border px-4 py-3 text-sm font-medium",
+                    submitState === "success"
+                      ? "border-emerald-200/50 bg-emerald-500/20 text-emerald-50"
+                      : "border-red-200/50 bg-red-500/20 text-red-50",
+                  )}
+                >
+                  {submitMessage}
+                </p>
+              )}
               <button
                 type="submit"
+                disabled={submitState === "submitting"}
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.01] sm:w-auto"
                 style={{ background: "var(--gradient-brand)" }}
               >
-                {t("form.submit")} <ArrowRight className="h-4 w-4" />
+                {submitState === "submitting" ? t("form.submitting") : t("form.submit")} <ArrowRight className="h-4 w-4" />
               </button>
             </form>
           </div>
