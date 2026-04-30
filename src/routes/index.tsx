@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Anchor,
@@ -52,6 +52,25 @@ export const Route = createFileRoute("/")({
 
 const WHATSAPP_URL = "https://wa.me/905468333700";
 const WEB3FORMS_ACCESS_KEY = "ed2564da-0f8d-4fcc-aa22-f16a545d56a8";
+const HCAPTCHA_SITE_KEY = "50b2fe65-b00b-4b9e-ad62-3ba471098be2";
+
+declare global {
+  interface Window {
+    hcaptcha?: {
+      render: (
+        container: HTMLElement,
+        options: {
+          sitekey: string;
+          theme?: "light" | "dark";
+          callback?: () => void;
+          "expired-callback"?: () => void;
+          "error-callback"?: () => void;
+        },
+      ) => string;
+      reset: (widgetId?: string) => void;
+    };
+  }
+}
 
 function Index() {
   return (
@@ -375,6 +394,43 @@ function FinalCTA() {
   const { ref, isVisible } = useIntersectionObserver();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
+  const captchaContainerRef = useRef<HTMLDivElement | null>(null);
+  const captchaWidgetIdRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isFormOpen || !captchaContainerRef.current || captchaWidgetIdRef.current) return;
+
+    const renderCaptcha = () => {
+      if (!window.hcaptcha || !captchaContainerRef.current || captchaWidgetIdRef.current) return;
+
+      captchaWidgetIdRef.current = window.hcaptcha.render(captchaContainerRef.current, {
+        sitekey: HCAPTCHA_SITE_KEY,
+        theme: "dark",
+        callback: () => setCaptchaError(false),
+        "expired-callback": () => setCaptchaError(true),
+        "error-callback": () => setCaptchaError(true),
+      });
+    };
+
+    if (window.hcaptcha) {
+      renderCaptcha();
+      return;
+    }
+
+    const existingScript = document.querySelector<HTMLScriptElement>('script[data-hcaptcha="true"]');
+    if (existingScript) {
+      existingScript.addEventListener("load", renderCaptcha, { once: true });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://js.hcaptcha.com/1/api.js?render=explicit&hl=${lang}`;
+    script.async = true;
+    script.defer = true;
+    script.dataset.hcaptcha = "true";
+    script.addEventListener("load", renderCaptcha, { once: true });
+    document.body.appendChild(script);
+  }, [isFormOpen, lang]);
 
   return (
     <section ref={ref} id="contact" className="py-24 text-white relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
@@ -482,13 +538,7 @@ function FinalCTA() {
                 />
               </label>
               <div className="mt-5">
-                <div
-                  className="h-captcha"
-                  data-captcha="true"
-                  data-sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2"
-                  data-theme="dark"
-                  data-lang={lang}
-                />
+                <div ref={captchaContainerRef} className="min-h-[78px]" />
                 {captchaError && (
                   <p className="mt-2 text-sm font-medium text-red-100">{t("form.captchaRequired")}</p>
                 )}
