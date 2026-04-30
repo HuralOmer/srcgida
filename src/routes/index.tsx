@@ -371,9 +371,10 @@ function FAQ() {
 
 /* ---------- FINAL CTA ---------- */
 function FinalCTA() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { ref, isVisible } = useIntersectionObserver();
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [captchaError, setCaptchaError] = useState(false);
 
   return (
     <section ref={ref} id="contact" className="py-24 text-white relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
@@ -414,6 +415,20 @@ function FinalCTA() {
             <form
               action="https://api.web3forms.com/submit"
               method="POST"
+              onSubmit={(event) => {
+                const form = event.currentTarget;
+                const captchaResponse = form.querySelector<HTMLTextAreaElement>(
+                  'textarea[name="h-captcha-response"]',
+                );
+
+                if (!captchaResponse?.value) {
+                  event.preventDefault();
+                  setCaptchaError(true);
+                  return;
+                }
+
+                setCaptchaError(false);
+              }}
               className="rounded-2xl border border-white/20 bg-white/10 p-6 text-left shadow-[var(--shadow-soft)] backdrop-blur-md md:p-8"
             >
               <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
@@ -466,6 +481,18 @@ function FinalCTA() {
                   placeholder={t("form.messagePlaceholder")}
                 />
               </label>
+              <div className="mt-5">
+                <div
+                  className="h-captcha"
+                  data-captcha="true"
+                  data-sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2"
+                  data-theme="dark"
+                  data-lang={lang}
+                />
+                {captchaError && (
+                  <p className="mt-2 text-sm font-medium text-red-100">{t("form.captchaRequired")}</p>
+                )}
+              </div>
               <button
                 type="submit"
                 className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.01] sm:w-auto"

@@ -122,6 +122,7 @@ const translations: Record<Lang, Dict> = {
     "form.emailPlaceholder": "name@company.com",
     "form.message": "Mesaj",
     "form.messagePlaceholder": "Talebinizi veya ürün listenizi yazın",
+    "form.captchaRequired": "Lütfen güvenlik doğrulamasını tamamlayın.",
     "form.submit": "Formu Gönder",
 
     "footer.tagline": "İstanbul merkezli B2B gıda ve gemi tedariki — gemiler, ağırlama ve toptan alıcılar için.",
@@ -245,6 +246,7 @@ const translations: Record<Lang, Dict> = {
     "form.emailPlaceholder": "name@company.com",
     "form.message": "Message",
     "form.messagePlaceholder": "Tell us about your request or product list",
+    "form.captchaRequired": "Please complete the security check.",
     "form.submit": "Submit Form",
 
     "footer.tagline": "Istanbul-based B2B food and ship supply for marine, hospitality and wholesale buyers.",
@@ -368,6 +370,7 @@ const translations: Record<Lang, Dict> = {
     "form.emailPlaceholder": "name@company.com",
     "form.message": "Nachricht",
     "form.messagePlaceholder": "Beschreiben Sie Ihre Anfrage oder Produktliste",
+    "form.captchaRequired": "Bitte schließen Sie die Sicherheitsprüfung ab.",
     "form.submit": "Formular senden",
 
     "footer.tagline": "B2B-Lebensmittel- und Schiffsausrüstung aus Istanbul für Schifffahrt, Gastronomie und Großhandel.",
@@ -491,6 +494,7 @@ const translations: Record<Lang, Dict> = {
     "form.emailPlaceholder": "name@company.com",
     "form.message": "Mensaje",
     "form.messagePlaceholder": "Cuéntanos tu solicitud o lista de productos",
+    "form.captchaRequired": "Completa la verificación de seguridad.",
     "form.submit": "Enviar formulario",
 
     "footer.tagline": "Suministro B2B de alimentos y naval con base en Estambul para marina, hostelería y mayoristas.",
