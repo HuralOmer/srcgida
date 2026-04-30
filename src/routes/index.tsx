@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Anchor,
@@ -50,6 +51,7 @@ export const Route = createFileRoute("/")({
 });
 
 const WHATSAPP_URL = "https://wa.me/905468333700";
+const WEB3FORMS_ACCESS_KEY = "ed2564da-0f8d-4fcc-aa22-f16a545d56a8";
 
 function Index() {
   return (
@@ -371,6 +373,8 @@ function FAQ() {
 function FinalCTA() {
   const { t } = useI18n();
   const { ref, isVisible } = useIntersectionObserver();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
   return (
     <section ref={ref} id="contact" className="py-24 text-white relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
       <div className="absolute -top-32 -right-32 h-96 w-96 rounded-full" style={{ background: "var(--color-brand-300)", opacity: 0.15, filter: "blur(80px)" }} />
@@ -379,13 +383,16 @@ function FinalCTA() {
         <h2 className="mt-6 text-3xl md:text-5xl font-bold leading-tight">{t("cta.title")}</h2>
         <p className="mt-5 text-white/80 text-lg">{t("cta.subtitle")}</p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <a
-            href="mailto:sales@srcgida.com"
+          <button
+            type="button"
+            onClick={() => setIsFormOpen((open) => !open)}
+            aria-expanded={isFormOpen}
+            aria-controls="quote-form"
             className="inline-flex items-center gap-2 rounded-md px-7 py-3.5 text-sm font-semibold text-white"
             style={{ backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)" }}
           >
-            {t("cta.getQuote")} <ArrowRight className="h-4 w-4" />
-          </a>
+            {t("cta.getInTouch")} <ArrowRight className={cn("h-4 w-4 transition-transform", isFormOpen && "rotate-90")} />
+          </button>
           <a
             href={WHATSAPP_URL}
             target="_blank"
@@ -395,6 +402,79 @@ function FinalCTA() {
           >
             <WhatsAppIcon className="h-4 w-4" /> {t("cta.whatsappShort")}
           </a>
+        </div>
+        <div
+          id="quote-form"
+          className={cn(
+            "mx-auto grid max-w-2xl transition-[grid-template-rows,opacity,transform,margin-top] duration-500 ease-out",
+            isFormOpen ? "mt-10 grid-rows-[1fr] opacity-100 translate-y-0" : "mt-0 grid-rows-[0fr] opacity-0 translate-y-3",
+          )}
+        >
+          <div className="overflow-hidden">
+            <form
+              action="https://api.web3forms.com/submit"
+              method="POST"
+              className="rounded-2xl border border-white/20 bg-white/10 p-6 text-left shadow-[var(--shadow-soft)] backdrop-blur-md md:p-8"
+            >
+              <input type="hidden" name="access_key" value={WEB3FORMS_ACCESS_KEY} />
+              <input type="hidden" name="subject" value="SRC Gida Website Contact Form" />
+              <input type="hidden" name="from_name" value="SRC Gida Website" />
+              <input type="checkbox" name="botcheck" className="hidden" tabIndex={-1} autoComplete="off" />
+
+              <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-medium text-white/90">{t("form.name")}</span>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    autoComplete="name"
+                    className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                    placeholder={t("form.namePlaceholder")}
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-medium text-white/90">{t("form.phone")}</span>
+                  <input
+                    type="tel"
+                    name="phone"
+                    required
+                    autoComplete="tel"
+                    className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                    placeholder={t("form.phonePlaceholder")}
+                  />
+                </label>
+              </div>
+              <label className="mt-5 block">
+                <span className="text-sm font-medium text-white/90">{t("form.email")}</span>
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  autoComplete="email"
+                  className="mt-2 h-12 w-full rounded-md border border-white/20 bg-white px-4 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                  placeholder={t("form.emailPlaceholder")}
+                />
+              </label>
+              <label className="mt-5 block">
+                <span className="text-sm font-medium text-white/90">{t("form.message")}</span>
+                <textarea
+                  name="message"
+                  required
+                  rows={5}
+                  className="mt-2 w-full resize-none rounded-md border border-white/20 bg-white px-4 py-3 text-sm text-foreground outline-none transition focus:border-[var(--color-brand-300)] focus:ring-2 focus:ring-white/30"
+                  placeholder={t("form.messagePlaceholder")}
+                />
+              </label>
+              <button
+                type="submit"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-semibold text-white transition-transform hover:scale-[1.01] sm:w-auto"
+                style={{ background: "var(--gradient-brand)" }}
+              >
+                {t("form.submit")} <ArrowRight className="h-4 w-4" />
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </section>

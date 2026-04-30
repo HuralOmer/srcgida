@@ -114,6 +114,15 @@ const translations: Record<Lang, Dict> = {
 
     "cta.title": "Güvenilir bir gıda tedarik partneri mi arıyorsunuz?",
     "cta.subtitle": "Ürün listenizi gönderin ve özel teklifinizi alın — hızlı, şeffaf, yükümlülüksüz.",
+    "form.name": "İsim Soyisim",
+    "form.namePlaceholder": "Adınız ve soyadınız",
+    "form.phone": "Telefon Numarası",
+    "form.phonePlaceholder": "+90 5xx xxx xx xx",
+    "form.email": "Şirket Mail Adresi",
+    "form.emailPlaceholder": "name@company.com",
+    "form.message": "Mesaj",
+    "form.messagePlaceholder": "Talebinizi veya ürün listenizi yazın",
+    "form.submit": "Formu Gönder",
 
     "footer.tagline": "İstanbul merkezli B2B gıda ve gemi tedariki — gemiler, ağırlama ve toptan alıcılar için.",
     "footer.company": "Şirket",
@@ -228,6 +237,15 @@ const translations: Record<Lang, Dict> = {
 
     "cta.title": "Looking for a reliable food supply partner?",
     "cta.subtitle": "Send your product list and get a tailored quotation — fast, transparent, no obligations.",
+    "form.name": "Full Name",
+    "form.namePlaceholder": "Your full name",
+    "form.phone": "Phone Number",
+    "form.phonePlaceholder": "+90 5xx xxx xx xx",
+    "form.email": "Company Email Address",
+    "form.emailPlaceholder": "name@company.com",
+    "form.message": "Message",
+    "form.messagePlaceholder": "Tell us about your request or product list",
+    "form.submit": "Submit Form",
 
     "footer.tagline": "Istanbul-based B2B food and ship supply for marine, hospitality and wholesale buyers.",
     "footer.company": "Company",
@@ -342,6 +360,15 @@ const translations: Record<Lang, Dict> = {
 
     "cta.title": "Suchen Sie einen verlässlichen Lebensmittel-Lieferpartner?",
     "cta.subtitle": "Senden Sie Ihre Produktliste und erhalten Sie ein maßgeschneidertes Angebot — schnell, transparent, unverbindlich.",
+    "form.name": "Vor- und Nachname",
+    "form.namePlaceholder": "Ihr vollständiger Name",
+    "form.phone": "Telefonnummer",
+    "form.phonePlaceholder": "+90 5xx xxx xx xx",
+    "form.email": "Firmen-E-Mail-Adresse",
+    "form.emailPlaceholder": "name@company.com",
+    "form.message": "Nachricht",
+    "form.messagePlaceholder": "Beschreiben Sie Ihre Anfrage oder Produktliste",
+    "form.submit": "Formular senden",
 
     "footer.tagline": "B2B-Lebensmittel- und Schiffsausrüstung aus Istanbul für Schifffahrt, Gastronomie und Großhandel.",
     "footer.company": "Unternehmen",
@@ -456,6 +483,15 @@ const translations: Record<Lang, Dict> = {
 
     "cta.title": "¿Buscas un socio de suministro alimentario fiable?",
     "cta.subtitle": "Envía tu lista de productos y recibe una cotización a medida — rápido, transparente, sin compromiso.",
+    "form.name": "Nombre y apellido",
+    "form.namePlaceholder": "Tu nombre completo",
+    "form.phone": "Número de teléfono",
+    "form.phonePlaceholder": "+90 5xx xxx xx xx",
+    "form.email": "Email de empresa",
+    "form.emailPlaceholder": "name@company.com",
+    "form.message": "Mensaje",
+    "form.messagePlaceholder": "Cuéntanos tu solicitud o lista de productos",
+    "form.submit": "Enviar formulario",
 
     "footer.tagline": "Suministro B2B de alimentos y naval con base en Estambul para marina, hostelería y mayoristas.",
     "footer.company": "Empresa",
