@@ -380,7 +380,7 @@ function FinalCTA() {
         <p className="mt-5 text-white/80 text-lg">{t("cta.subtitle")}</p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <a
-            href="mailto:hello@marinsupply.com"
+            href="mailto:sales@srcgida.com"
             className="inline-flex items-center gap-2 rounded-md px-7 py-3.5 text-sm font-semibold text-white"
             style={{ backgroundColor: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.3)" }}
           >
