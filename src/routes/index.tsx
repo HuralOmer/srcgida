@@ -16,6 +16,8 @@ import {
   Globe2,
   Clock,
   BadgeCheck,
+  Upload,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Header, WhatsAppIcon } from "@/components/Header";
@@ -68,10 +70,12 @@ const WHATSAPP_URL = "https://wa.me/905468333700";
 const WEB3FORMS_ACCESS_KEY = "ed2564da-0f8d-4fcc-aa22-f16a545d56a8";
 
 function Index() {
+  const [isRfqOpen, setIsRfqOpen] = useState(false);
+
   return (
     <div className="min-h-screen">
       <Header />
-      <Hero />
+      <Hero onRequestQuote={() => setIsRfqOpen(true)} />
       <WhoWeServe />
       <Categories />
       <CoreServices />
@@ -80,12 +84,13 @@ function Index() {
       <FAQ />
       <FinalCTA />
       <Footer />
+      <RFQModal isOpen={isRfqOpen} onClose={() => setIsRfqOpen(false)} />
     </div>
   );
 }
 
 /* ---------- HERO ---------- */
-function Hero() {
+function Hero({ onRequestQuote }: { onRequestQuote: () => void }) {
   const { t } = useI18n();
   
   return (
@@ -108,13 +113,14 @@ function Hero() {
               {t("hero.h2")}
             </h2>
             <div className="mt-10 flex flex-wrap gap-4 animate-hero-up delay-500">
-              <a
-                href="#contact"
+              <button
+                type="button"
+                onClick={onRequestQuote}
                 className="inline-flex items-center gap-2 rounded-md px-7 py-3.5 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-105"
                 style={{ backgroundColor: "rgba(255,255,255,0.18)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,0.3)" }}
               >
                 {t("cta.getQuote")} <ArrowRight className="h-4 w-4" />
-              </a>
+              </button>
               <a
                 href={WHATSAPP_URL}
                 target="_blank"
@@ -541,6 +547,189 @@ function FinalCTA() {
         </div>
       </div>
     </section>
+  );
+}
+
+/* ---------- RFQ MODAL ---------- */
+function RFQModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const { t } = useI18n();
+  const [fileNames, setFileNames] = useState<string[]>([]);
+  const [submitState, setSubmitState] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [submitMessage, setSubmitMessage] = useState("");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 px-4 py-6 backdrop-blur-sm md:py-10">
+      <div className="relative w-full max-w-5xl overflow-hidden rounded-2xl bg-background text-foreground shadow-2xl animate-fade-in-up">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t("rfq.close")}
+          className="absolute right-4 top-4 z-10 inline-grid h-10 w-10 place-items-center rounded-full border border-border bg-background text-foreground transition hover:bg-secondary"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        {submitState === "success" ? (
+          <div className="px-6 py-14 text-center md:px-10">
+            <lottie-player
+              src="/lottie/message-sent-plane.json"
+              background="transparent"
+              speed="1"
+              autoplay
+              className="mx-auto h-56 w-56"
+              aria-label={t("form.successAnimation")}
+            />
+            <h2 className="mt-5 text-3xl font-bold">{t("rfq.successTitle")}</h2>
+            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">{submitMessage}</p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="mt-8 inline-flex items-center justify-center rounded-md px-6 py-3 text-sm font-semibold text-white"
+              style={{ background: "var(--gradient-brand)" }}
+            >
+              {t("rfq.close")}
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="border-b border-border px-6 py-7 md:px-10">
+              <h2 className="text-2xl font-bold md:text-3xl">{t("rfq.title")}</h2>
+              <p className="mt-3 text-sm text-muted-foreground md:text-base">{t("rfq.subtitle")}</p>
+            </div>
+
+            <form
+              className="px-6 py-8 md:px-10"
+              onSubmit={async (event) => {
+                event.preventDefault();
+                const form = event.currentTarget;
+                setSubmitState("submitting");
+                setSubmitMessage("");
+
+                try {
+                  const response = await fetch("/api/rfq", {
+                    method: "POST",
+                    body: new FormData(form),
+                  });
+                  const result = await response.json();
+
+                  if (response.ok && result.success) {
+                    form.reset();
+                    setFileNames([]);
+                    setSubmitState("success");
+                    setSubmitMessage(t("rfq.success"));
+                    return;
+                  }
+
+                  setSubmitState("error");
+                  setSubmitMessage(result.message || t("rfq.error"));
+                } catch {
+                  setSubmitState("error");
+                  setSubmitMessage(t("rfq.error"));
+                }
+              }}
+            >
+              <div className="grid gap-5 md:grid-cols-2">
+                <RFQField label={t("rfq.name")} name="name" required />
+                <RFQField label={t("rfq.company")} name="company" required />
+                <RFQField label={t("rfq.email")} name="email" type="email" required />
+                <RFQField label={t("rfq.phone")} name="phone" type="tel" required />
+                <RFQField label={t("rfq.vessel")} name="vessel" />
+                <RFQField label={t("rfq.port")} name="port" />
+                <RFQField label={t("rfq.eta")} name="eta" type="datetime-local" />
+
+                <label className="block">
+                  <span className="text-sm font-medium">{t("rfq.documents")}</span>
+                  <div className="relative mt-2 grid min-h-52 place-items-center rounded-md border-2 border-dashed border-border bg-secondary/40 px-6 py-8 text-center transition hover:border-[var(--color-brand-600)]">
+                    <input
+                      type="file"
+                      name="documents"
+                      multiple
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png,.zip,.rar"
+                      className="absolute inset-0 cursor-pointer opacity-0"
+                      onChange={(event) => {
+                        setFileNames(Array.from(event.currentTarget.files ?? []).map((file) => file.name));
+                      }}
+                    />
+                    <div>
+                      <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-background text-[var(--color-brand-800)]">
+                        <Upload className="h-5 w-5" />
+                      </span>
+                      <p className="mt-4 font-semibold">{t("rfq.drop")}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{t("rfq.browse")}</p>
+                      <p className="mt-3 text-xs font-medium text-muted-foreground">{t("rfq.supported")}</p>
+                      {fileNames.length > 0 && (
+                        <ul className="mt-4 space-y-1 text-xs font-medium text-[var(--color-brand-800)]">
+                          {fileNames.map((name) => (
+                            <li key={name}>{name}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <label className="mt-5 block">
+                <span className="text-sm font-medium">{t("rfq.message")}</span>
+                <textarea
+                  name="message"
+                  rows={4}
+                  className="mt-2 w-full resize-none rounded-md border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-[var(--color-brand-600)] focus:ring-2 focus:ring-[var(--color-brand-300)]/40"
+                />
+              </label>
+
+              <label className="mt-5 flex items-start gap-3 text-sm">
+                <input type="checkbox" name="terms" required className="mt-1 h-4 w-4 rounded border-input" />
+                <span>{t("rfq.terms")}</span>
+              </label>
+
+              {submitMessage && submitState === "error" && (
+                <p className="mt-5 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm font-medium text-destructive">
+                  {submitMessage}
+                </p>
+              )}
+
+              <div className="mt-8 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={submitState === "submitting"}
+                  className="inline-flex min-w-36 items-center justify-center gap-2 rounded-md px-6 py-3 text-sm font-semibold text-white transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70"
+                  style={{ background: "var(--gradient-brand)" }}
+                >
+                  {submitState === "submitting" ? t("rfq.submitting") : t("rfq.submit")} <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RFQField({
+  label,
+  name,
+  type = "text",
+  required = false,
+}: {
+  label: string;
+  name: string;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="block">
+      <span className="text-sm font-medium">{label}</span>
+      <input
+        type={type}
+        name={name}
+        required={required}
+        className="mt-2 h-11 w-full rounded-md border border-input bg-background px-4 text-sm outline-none transition focus:border-[var(--color-brand-600)] focus:ring-2 focus:ring-[var(--color-brand-300)]/40"
+      />
+    </label>
   );
 }
 
